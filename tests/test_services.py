@@ -1,7 +1,5 @@
 import json
 
-import pytest
-
 from src.services import filter_transactions_to_individuals, filter_transactions_with_phone_numbers
 
 
