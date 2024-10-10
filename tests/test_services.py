@@ -16,7 +16,6 @@ def test_filter_transactions_with_phone_numbers():
         {"id": 3, "description": "Звонок по номеру 8-987-654-32-10"},
         {"id": 5, "description": "Контакт: 123 456 78 90"},
     ]
-
     result = filter_transactions_with_phone_numbers(transactions)
     assert json.loads(result) == expected_result
 

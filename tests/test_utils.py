@@ -1,9 +1,9 @@
-import unittest
-from unittest.mock import patch
-from datetime import datetime
 import json
+import unittest
+from datetime import datetime
+from unittest.mock import Mock, patch
 
-from src.utils import greetings_time, get_card_data, get_top_transactions, get_currency_rates, get_sp500_stock_prices
+from src.utils import get_card_data, get_currency_rates, get_sp500_stock_prices, get_top_transactions, greetings_time
 
 
 class TestGreetingsTime(unittest.TestCase):
@@ -86,7 +86,6 @@ class TestGetTopTransactions(unittest.TestCase):
         )
         self.assertEqual(get_top_transactions(transactions), expected)
 
-
     def test_transactions_with_negative_amounts(self):
         transactions = [
             {"id": 1, "amount": -100},
@@ -107,6 +106,78 @@ class TestGetTopTransactions(unittest.TestCase):
             }
         )
         self.assertEqual(get_top_transactions(transactions), expected)
+
+
+class TestGetCurrencyRates(unittest.TestCase):
+
+    @patch("requests.get")
+    def test_successful_response(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"rates": {"USD": 75.5, "EUR": 85.0}}
+        mock_get.return_value = mock_response
+        api_key = "test_api_key"
+        expected = {"rates": {"USD": 75.5, "EUR": 85.0}}
+        self.assertEqual(get_currency_rates(api_key), expected)
+
+    @patch("requests.get")
+    def test_failed_response(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 404
+        mock_get.return_value = mock_response
+
+        api_key = "test_api_key"
+        expected = {"error": "Unable to fetch data", "status_code": 404}
+        self.assertEqual(get_currency_rates(api_key), expected)
+
+    @patch("requests.get")
+    def test_other_error_response(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_get.return_value = mock_response
+
+        api_key = "test_api_key"
+        expected = {"error": "Unable to fetch data", "status_code": 500}
+        self.assertEqual(get_currency_rates(api_key), expected)
+
+
+class TestGetSP500StockPrices(unittest.TestCase):
+
+    @patch("requests.get")
+    def test_successful_response(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "stocks": [{"symbol": "AAPL", "name": "Apple Inc."}, {"symbol": "MSFT", "name": "Microsoft Corp."}]
+        }
+        mock_get.return_value = mock_response
+
+        api_key_2 = "test_api_key"
+        expected = json.dumps(
+            {"stocks": [{"symbol": "AAPL", "name": "Apple Inc."}, {"symbol": "MSFT", "name": "Microsoft Corp."}]},
+            indent=4,
+        )
+        self.assertEqual(get_sp500_stock_prices(api_key_2), expected)
+
+    @patch("requests.get")
+    def test_failed_response(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 404
+        mock_get.return_value = mock_response
+
+        api_key_2 = "test_api_key"
+        expected = json.dumps({"error": "Unable to fetch data"}, indent=4)
+        self.assertEqual(get_sp500_stock_prices(api_key_2), expected)
+
+    @patch("requests.get")
+    def test_other_error_response(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_get.return_value = mock_response
+
+        api_key_2 = "test_api_key"
+        expected = json.dumps({"error": "Unable to fetch data"}, indent=4)
+        self.assertEqual(get_sp500_stock_prices(api_key_2), expected)
 
 
 if __name__ == "__main__":

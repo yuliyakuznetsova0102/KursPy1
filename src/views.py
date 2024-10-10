@@ -1,6 +1,7 @@
 import json
+import pandas as pd
 from datetime import datetime
-
+import numpy
 
 def date_time_to_json(date_time_str):
     try:
@@ -14,9 +15,23 @@ def date_time_to_json(date_time_str):
     return json.dumps(response)
 
 
-date_time_input = "2023-10-05 14:30:00"
-json_output = date_time_to_json(date_time_input)
-print(json_output)
 
 
-Mw!@nWC2pBm9gD5
+
+def get_excel(formatting):
+    current_transactions = []
+    get_excel_file = pd.read_excel("../data/operations.xlsx")
+    if formatting == "dataframe":
+        return get_excel_file
+    elif formatting == "dict":
+        for transaction in get_excel_file.to_dict(orient="records"):
+            transaction = {
+                key: (
+                    None if isinstance(value, float) and numpy.isnan(value) else value
+                )
+                for key, value in transaction.items()
+            }
+            current_transactions.append(transaction)
+        return current_transactions
+    else:
+        raise ValueError("Invalid format specified. Use 'dataframe' or 'dict'.")
