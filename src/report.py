@@ -1,14 +1,14 @@
-from collections.abc import Callable
+import os
 from datetime import datetime, timedelta
 
 import pandas as pd
 
 
-def log_results_to_file(file_name:str) -> Callable:
-    def decorator(func: Callable) -> Callable:
+def log_results_to_file(file_name):
+    def decorator(func):
         def wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
-            with open(file_name, "w") as f:
+            with open(file_name, "a") as f:
                 f.write(f"{datetime.now()}: {result}\n")
             return result
 
@@ -17,10 +17,8 @@ def log_results_to_file(file_name:str) -> Callable:
     return decorator
 
 
-@log_results_to_file('report.txt')
-def spending_by_weekday(transactions, date=None):
-    '''Функция принимает датафрейм с транзакциями и опциональную дату.
-    Фильтрует транзакции за последние три месяца и вычисляет стредние траты по дням недели'''
+@log_results_to_file("report_results.txt")
+def average_spending_per_weekday(transactions, date=None):
     transactions["date"] = pd.to_datetime(transactions["date"])
     if date is None:
         date = datetime.now()
