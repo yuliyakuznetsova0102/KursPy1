@@ -13,7 +13,7 @@ logging.basicConfig(
 utils_logger = logging.getLogger("utils")
 
 
-def greetings_time(current_datetime):
+def greetings_time():
     """Функция приветствия в формате "???", где ??? — «Доброе утро» / «Добрый день» /
     «Добрый вечер» / «Доброй ночи» в зависимости от текущего времени."""
     now = datetime.now()
@@ -39,7 +39,7 @@ def get_card_data(cards):
     кешбэк (1 рубль на каждые 100 рублей)."""
     response = []
     for card in cards:
-        last_four_digits = card["card_number"][-4:]
+        last_four_digits = card["number"][-4:]
         utils_logger.info("Последние 4 цифры карты")
         total_spent = sum(card["transactions"])
         utils_logger.info("Общая сумма расходов")
