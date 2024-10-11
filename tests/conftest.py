@@ -1,5 +1,6 @@
-import pytest
 import pandas as pd
+import pytest
+
 
 @pytest.fixture
 def sample_transactions():
@@ -19,6 +20,7 @@ def sample_transactions():
         "amount": [100, 200, 150, 300, 250, 100, 50, 80, 90, 120],
     }
     return pd.DataFrame(data)
+
 
 @pytest.fixture
 def get_excel_0():
